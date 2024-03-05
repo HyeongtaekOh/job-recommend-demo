@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  mongodb:
+    image: "mongo"
+    container_name: "mongo"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: oh
+      MONGO_INITDB_ROOT_PASSWORD: ohssafy
+      MONGO_INITDB_DATABASE: recommend
+    ports:
+      - "27017:27017"
+    volumes:
+      - "data:/data/db"
+    restart: on-failure
+
+volumes:
+    data:
+      driver: local
