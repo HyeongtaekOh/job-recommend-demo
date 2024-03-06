@@ -1,9 +1,12 @@
+import SparkRecommendService.recommendTop5JobPostings
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.StatusCodes.OK
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.Dataset
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
@@ -29,6 +32,14 @@ object AkkaHttpJsonExample {
           entity(as[User]) { user =>
             println(s"Received user: ${user.name}, ${user.age}")
             complete(user)
+          }
+        }
+      } ~
+      path("recommend") {
+        get {
+          parameters("userId".as[Int]) { userId =>
+            val recommendedJobs = recommendTop5JobPostings(userId)
+            complete(OK, recommendedJobs)
           }
         }
       }
