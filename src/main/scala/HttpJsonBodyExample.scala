@@ -24,9 +24,16 @@ object AkkaHttpJsonExample {
     implicit val system = ActorSystem(Behaviors.empty, "AkkaHttpJsonSystem")
     implicit val executionContext = system.executionContext
 
+    Logger.getLogger("org").setLevel(Level.ERROR)
+
     import JsonFormats._ // JSON 마샬러를 가져옵니다.
 
-    val route =
+    val route = {
+      path("hello") {
+        get {
+          complete(OK, "Hello, World!")
+        }
+      } ~
       path("user") {
         post {
           entity(as[User]) { user =>
@@ -38,11 +45,13 @@ object AkkaHttpJsonExample {
       path("recommend") {
         get {
           parameters("userId".as[Int]) { userId =>
+            println(s"Received userId: $userId")
             val recommendedJobs = recommendTop5JobPostings(userId)
             complete(OK, recommendedJobs)
           }
         }
       }
+    }
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(route)
 

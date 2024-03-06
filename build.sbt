@@ -15,8 +15,8 @@ lazy val root = (project in file("."))
 libraryDependencies ++= Seq(
   // Logback
 //  "ch.qos.logback" % "logback-classic" % "1.5.2",
-//  // MongoDB Scala Driver
-//  "org.mongodb.scala" %% "mongo-scala-driver" % "4.11.1",
+  // MongoDB Scala Driver
+  "org.mongodb.scala" %% "mongo-scala-driver" % "4.8.2",
   // Spark
   "org.apache.spark" %% "spark-core" % "3.2.2",
   "org.apache.spark" %% "spark-sql" % "3.2.2",

@@ -218,3 +218,5 @@ spark-warehouse/
 
 # For SBT
 .jvmopts
+
+.bsp/

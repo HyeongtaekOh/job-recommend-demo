@@ -1,9 +1,6 @@
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{Dataset, SparkSession}
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.SparkSession
 
 import scala.collection.mutable
-import scala.collection.mutable.ArraySeq
 
 object SparkRecommendService {
 
