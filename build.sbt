@@ -20,8 +20,7 @@ libraryDependencies ++= Seq(
   // Spark
   "org.apache.spark" %% "spark-core" % "3.2.2",
   "org.apache.spark" %% "spark-sql" % "3.2.2",
-//  "org.mongodb.spark" %% "mongo-spark-connector" % "10.2.1",
-//  "org.mongodb.scala" %% "mongo-scala-driver" % "4.11.1", // MongoDB Scala 드라이버 (버전은 확인 필요)
+  "org.apache.spark" %% "spark-mllib" % "3.2.2",
   "org.mongodb.spark" %% "mongo-spark-connector" % "10.2.1",
   // Akka
   "com.typesafe.akka" %% "akka-http" % "10.5.3",
