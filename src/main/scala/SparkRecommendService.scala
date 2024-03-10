@@ -8,8 +8,6 @@ object SparkRecommendService {
     val spark = SparkSession.builder
       .appName("JobPostingRecommendationApp")
       .master("local")
-      //      .config("spark.driver.extraJavaOptions", "add-opens java.base/sun.nio.ch=ALL-UNNAMED")
-      //      .config("spark.executor.extraJavaOptions", "--add-opens java.base/sun.nio.ch=ALL-UNNAMED")
       .config("spark.mongodb.input.uri", "mongodb://oh:ohssafy@localhost:27017")
       .getOrCreate()
 
@@ -19,7 +17,7 @@ object SparkRecommendService {
       .format("mongodb")
       .option("connection.uri", "mongodb://oh:ohssafy@localhost:27017")
       .option("database", "recommend")
-      .option("collection", "jobPosting")
+      .option("collection", "jobPostings")
       .load()
 
     val userProfilesDF = spark.read

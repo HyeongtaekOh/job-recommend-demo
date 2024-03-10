@@ -24,22 +24,27 @@ object Similarity {
       (2, "Data Scientist", Seq("Python", "R", "TensorFlow", "Keras", "Pandas", "NumPy", "Scikit-learn"))
     ).toDF("userId", "position", "techStack")
 
-    val jobPostings0 = Seq(
-      (1, "Backend Developer", Seq("Java", "Spring Boot", "MongoDB", "Docker", "AWS", "Git", "Jenkins"), Seq("Kubernetes", "Ansible", "Terraform")),
-      (2, "Data Scientist", Seq("Python", "R", "SQL", "TensorFlow", "PyTorch"), Seq("Apache Spark", "Hadoop", "Keras"))
-    ).toDF("jobId", "position", "requiredTechStack", "preferredTechStack")
-//    val userProfiles = Seq(
-//      (0, Array("Java", "Python")),
-//      (1, Array("Python", "Scala"))
-//    ).toDF("userId", "techStack")
-//
-//    val jobPostings = Seq(
-//      (0, Array("Python", "Scala")),
-//      (1, Array("Java", "Scala"))
-//    ).toDF("jobId", "techStack")
+//    val jobPostings0 = Seq(
+//      (1, "Backend Developer", Seq("Java", "Spring Boot", "MongoDB", "Docker", "AWS", "Git", "Jenkins"), Seq("Kubernetes", "Ansible", "Terraform")),
+//      (2, "Data Scientist", Seq("Python", "R", "SQL", "TensorFlow", "PyTorch"), Seq("Apache Spark", "Hadoop", "Keras"))
+//    ).toDF("jobId", "position", "requiredTechStack", "preferredTechStack")
 
-    val jobPostings = jobPostings0.map(row => (row.getInt(0), row.getString(1), row.getSeq[String](2) ++ row.getSeq[String](2) ++ row.getSeq[String](3)))
-      .toDF("jobId", "position", "techStack")
+    val jobPostingsDF = spark.read
+      .format("mongodb")
+      .option("connection.uri", "mongodb://oh:ohssafy@localhost:27017")
+      .option("database", "recommend")
+      .option("collection", "jobPostings")
+      .load()
+      .select("_id", "company", "qualificationRequirements", "preferredRequirements")
+
+
+
+    val jobPostings = jobPostingsDF.map(
+        row => (
+          row.getInt(0),
+          row.getString(1),
+          row.getSeq[String](2) ++ row.getSeq[String](2) ++ row.getSeq[String](3))
+      ).toDF("jobId", "company", "techStack")
 
     // CountVectorizer를 사용하여 기술 스택 벡터화
     val cvModel = new CountVectorizer()
@@ -52,7 +57,7 @@ object Similarity {
     cvModel.vocabulary.foreach(println)
 
     val userFeatures = cvModel.transform(userProfiles).toDF("userId", "position", "techStack", "features_user")
-    val jobFeatures = cvModel.transform(jobPostings).toDF("jobId", "position", "techStack", "features_job")
+    val jobFeatures = cvModel.transform(jobPostings).toDF("jobId", "company", "techStack", "features_job")
 
     userFeatures.show()
     jobFeatures.show()
@@ -104,10 +109,18 @@ object Similarity {
       println("jobVec = ", jobVec)
       println(row)
       val similarity = cosineSimilarity(userVec, jobVec)
-      (row.getAs[Int]("userId"), row.getAs[Int]("jobId"), similarity) // (userId, jobId, similarityScore)
-    }.toDF("userId", "jobId", "similarityScore")
+      (row.getAs[Int]("userId"), row.getAs[Int]("jobId"), row.getAs[String]("company"), similarity) // (userId, jobId, company, similarityScore)
+    }.toDF("userId", "jobId", "company", "similarityScore")
       .sort($"userId", $"similarityScore".desc)
 
-    similarityScores.show()
+    similarityScores
+      .filter($"userId" === 1)
+      .limit(10)
+      .show()
+
+    similarityScores
+      .filter($"userId" === 2)
+      .limit(10)
+      .show()
   }
 }
